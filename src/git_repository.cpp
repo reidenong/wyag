@@ -35,6 +35,8 @@ GitRepository::GitRepository(const fs::path& path, bool ignore_checks)
     }
 }
 
+GitRepository::GitRepository(GitRepository&&) noexcept = default;
+GitRepository& GitRepository::operator=(GitRepository&&) noexcept = default;
 GitRepository::~GitRepository() = default;
 
 GitRepository create_repo(const fs::path& path) {

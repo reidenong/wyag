@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <memory>
 
+// Configuration reader
 class INIReader;
 
 class GitRepository {
@@ -19,8 +20,8 @@ class GitRepository {
     GitRepository& operator=(const GitRepository&) = delete;
 
     // Allow moving
-    GitRepository(GitRepository&&) noexcept = default;
-    GitRepository& operator=(GitRepository&&) noexcept = default;
+    GitRepository(GitRepository&&) noexcept;
+    GitRepository& operator=(GitRepository&&) noexcept;
 
     ~GitRepository();
 

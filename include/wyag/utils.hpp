@@ -5,6 +5,10 @@
 
 #include "wyag/git_repository.hpp"
 
+// Finds a git repository in the path or its parents
+std::optional<GitRepository> find_repo(const std::filesystem::path& path,
+                                       bool throw_exception = true);
+
 // General path building function
 std::filesystem::path repo_path(
     const GitRepository& repo, const std::vector<std::filesystem::path>& parts);

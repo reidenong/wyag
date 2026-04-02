@@ -4,6 +4,18 @@
 #include <stdexcept>
 namespace fs = std::filesystem;
 
+std::optional<GitRepository> find_repo(const fs::path& path,
+                                       bool throw_exception) {
+    if (fs::is_directory(path / ".git")) return GitRepository{path};
+
+    // Recursively search in parent
+    fs::path parent{path / ".."};
+    if (parent != path) return find_repo(parent, throw_exception);
+
+    if (throw_exception) throw std::runtime_error("No git directory found.");
+    return std::nullopt;
+}
+
 fs::path repo_path(const GitRepository& repo,
                    const std::vector<fs::path>& parts) {
     fs::path result{repo.get_gitdir()};
