@@ -1,8 +1,12 @@
 #include "wyag/utils.hpp"
 
+#include <zlib.h>
+
 #include <fstream>
 #include <stdexcept>
+
 namespace fs = std::filesystem;
+using Bytes = std::vector<std::uint8_t>;
 
 std::optional<GitRepository> find_repo(const fs::path& path,
                                        bool throw_exception) {
@@ -61,4 +65,47 @@ void write_default_config(fs::path path) {
     file << "\trepositoryformatversion = 0\n";
     file << "\tfilemode = false\n";
     file << "\tbare = false\n";
+}
+
+Bytes read_file(const fs::path& path) {
+    std::ifstream file(path, std::ios::binary);
+    if (!file)
+        throw std::runtime_error("Failed to open file: " + path.string());
+    return Bytes(std::istreambuf_iterator<char>(file),
+                 std::istreambuf_iterator<char>());
+}
+
+Bytes streaming_decompress(const Bytes& compressed) {
+    z_stream stream{};
+    stream.next_in =
+        const_cast<Bytef*>(reinterpret_cast<const Bytef*>(compressed.data()));
+    stream.avail_in = static_cast<uInt>(compressed.size());
+
+    if (inflateInit(&stream) != Z_OK) {
+        throw std::runtime_error(
+            "inflateInit failed during streaming decompression.");
+    }
+
+    Bytes result;
+    std::uint8_t buffer[K_CHUNK_SIZE];
+
+    int ret{Z_OK};
+    do {
+        stream.next_out = reinterpret_cast<Bytef*>(buffer);
+        stream.avail_out = static_cast<uInt>(K_CHUNK_SIZE);
+
+        ret = inflate(&stream, Z_NO_FLUSH);
+
+        if (ret != Z_OK && ret != Z_STREAM_END) {
+            inflateEnd(&stream);
+            throw std::runtime_error("inflate failed");
+        }
+
+        const std::size_t produced = K_CHUNK_SIZE - stream.avail_out;
+        result.insert(result.end(), buffer, buffer + produced);
+
+    } while (ret != Z_STREAM_END);
+
+    inflateEnd(&stream);
+    return result;
 }
