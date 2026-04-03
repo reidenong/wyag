@@ -2,6 +2,8 @@
 
 A modern C++ implementation of parts of Thibault Polge's WYAG project.
 
+Original project: https://wyag.thb.lt/#table-of-contents
+
 ## Build
 
 ```bash
