@@ -5,7 +5,7 @@ namespace CLI {
 class App;
 }
 
-// Init Command
+// init Command
 struct InitOptions {
     std::string path{"."};
 };
@@ -15,3 +15,15 @@ struct InitBinding {
 };
 InitBinding register_init(CLI::App& app);
 int run_init(const InitOptions& opts);
+
+// cat-file Command
+struct CatFileOptions {
+    std::string type{};
+    std::string object_id{};
+};
+struct CatFileBinding {
+    CLI::App* subcommand{};
+    CatFileOptions options{};
+};
+CatFileBinding register_catfile(CLI::App& app);
+int run_catfile(const CatFileOptions& opts);

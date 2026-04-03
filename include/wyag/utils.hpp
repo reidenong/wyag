@@ -8,9 +8,12 @@
 // Constants
 constexpr std::size_t K_CHUNK_SIZE{4096};
 
+// Tries to find a git repository in the path or its parents
+std::optional<GitRepository> try_find_repo(
+    const std::filesystem::path& path = ".");
+
 // Finds a git repository in the path or its parents
-std::optional<GitRepository> find_repo(const std::filesystem::path& path,
-                                       bool throw_exception = true);
+GitRepository find_repo(const std::filesystem::path& path = ".");
 
 // General path building function
 std::filesystem::path repo_path(

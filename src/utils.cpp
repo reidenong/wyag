@@ -9,16 +9,18 @@
 namespace fs = std::filesystem;
 using Bytes = std::vector<std::uint8_t>;
 
-std::optional<GitRepository> find_repo(const fs::path& path,
-                                       bool throw_exception) {
+std::optional<GitRepository> try_find_repo(const fs::path& path) {
     if (fs::is_directory(path / ".git")) return GitRepository{path};
 
-    // Recursively search in parent
-    fs::path parent{path / ".."};
-    if (parent != path) return find_repo(parent, throw_exception);
+    const fs::path parent{path / ".."};
+    if (parent != path) return try_find_repo(parent);
 
-    if (throw_exception) throw std::runtime_error("No git directory found.");
     return std::nullopt;
+}
+
+GitRepository find_repo(const fs::path& path) {
+    if (auto repo = try_find_repo(path)) return std::move(*repo);
+    throw std::runtime_error("No git directory found.");
 }
 
 fs::path repo_path(const GitRepository& repo,

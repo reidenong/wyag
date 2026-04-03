@@ -10,12 +10,14 @@ int main(int argc, char** argv) {
 
     // Register commands
     auto init = register_init(app);
+    auto catfile = register_catfile(app);
 
     // Run command
     try {
         CLI11_PARSE(app, argc, argv);
 
         if (*init.subcommand) return run_init(init.options);
+        if (*catfile.subcommand) return run_catfile(catfile.options);
     } catch (const std::exception& e) {
         std::cerr << "wyag: " << e.what() << '\n';
         return 1;

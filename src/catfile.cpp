@@ -1,0 +1,35 @@
+#include <iostream>
+
+#include "CLI11.hpp"
+#include "wyag/cli.hpp"
+#include "wyag/git_objects.hpp"
+#include "wyag/git_repository.hpp"
+#include "wyag/utils.hpp"
+
+CatFileBinding register_catfile(CLI::App& app) {
+    CatFileBinding binding{};
+    binding.subcommand =
+        app.add_subcommand("cat-file", "Provide content of repository object");
+    binding.subcommand->add_option("type", binding.options.type,
+                                   "Specify the type.");
+    binding.subcommand->add_option("object_id", binding.options.object_id,
+                                   "The identifier of the object to display.");
+    return binding;
+}
+
+void cat_file(const GitRepository& repo, std::string_view obj_id,
+              std::string_view format) {
+    std::unique_ptr<GitObject> obj =
+        read_object(repo, find_object(repo, obj_id, format));
+    auto bytes = obj->serialize();
+    std::cout.write(reinterpret_cast<const char*>(bytes.data()),
+                    static_cast<std::streamsize>(bytes.size()));
+    if (!std::cout)
+        throw std::runtime_error("cat-file failed to write to stdout.");
+}
+
+int run_catfile(const CatFileOptions& opt) {
+    GitRepository repo = find_repo();
+    cat_file(repo, opt.object_id, opt.type);
+    return 0;
+}

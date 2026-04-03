@@ -34,3 +34,7 @@ std::unique_ptr<GitObject> read_object(const GitRepository& repo,
 
 // Compute the hash and write object in the correct location
 std::string write_object(const GitObject& obj, const GitRepository* repo);
+
+// Find an object based on its identifier
+std::string find_object(const GitRepository& repo, std::string_view name,
+                        std::string_view format);

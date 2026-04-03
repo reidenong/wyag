@@ -78,3 +78,8 @@ std::string write_object(const GitObject& obj, const GitRepository* repo) {
     }
     return sha;
 }
+
+std::string find_object(const GitRepository& repo, std::string_view name,
+                        std::string_view format) {
+    return std::string{name};
+}
