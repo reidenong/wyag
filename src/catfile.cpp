@@ -10,17 +10,21 @@ CatFileBinding register_catfile(CLI::App& app) {
     CatFileBinding binding{};
     binding.subcommand =
         app.add_subcommand("cat-file", "Provide content of repository object");
-    binding.subcommand->add_option("type", binding.options.type,
-                                   "Specify the type.");
+    binding.subcommand
+        ->add_option("object_type", binding.options.object_type,
+                     "Specify the type.")
+        ->check(CLI::IsMember(GIT_OBJECT_TYPES));
     binding.subcommand->add_option("object_id", binding.options.object_id,
                                    "The identifier of the object to display.");
     return binding;
 }
 
 void cat_file(const GitRepository& repo, std::string_view obj_id,
-              std::string_view format) {
+              std::string_view object_type) {
     std::unique_ptr<GitObject> obj =
-        read_object(repo, find_object(repo, obj_id, format));
+        read_object(repo, find_object(repo, obj_id, object_type));
+
+    if (!obj) throw std::runtime_error("Object does not exist.");
     auto bytes = obj->serialize();
     std::cout.write(reinterpret_cast<const char*>(bytes.data()),
                     static_cast<std::streamsize>(bytes.size()));
@@ -30,6 +34,6 @@ void cat_file(const GitRepository& repo, std::string_view obj_id,
 
 int run_catfile(const CatFileOptions& opt) {
     GitRepository repo = find_repo();
-    cat_file(repo, opt.object_id, opt.type);
+    cat_file(repo, opt.object_id, opt.object_type);
     return 0;
 }

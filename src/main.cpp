@@ -11,6 +11,7 @@ int main(int argc, char** argv) {
     // Register commands
     auto init = register_init(app);
     auto catfile = register_catfile(app);
+    auto hashfile = register_hashfile(app);
 
     // Run command
     try {
@@ -18,6 +19,7 @@ int main(int argc, char** argv) {
 
         if (*init.subcommand) return run_init(init.options);
         if (*catfile.subcommand) return run_catfile(catfile.options);
+        if (*hashfile.subcommand) return run_hashfile(hashfile.options);
     } catch (const std::exception& e) {
         std::cerr << "wyag: " << e.what() << '\n';
         return 1;

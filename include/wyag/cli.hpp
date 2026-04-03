@@ -1,9 +1,16 @@
 #pragma once
 #include <string>
+#include <string_view>
+
+#include "wyag/git_repository.hpp"
 
 namespace CLI {
 class App;
 }
+
+// Constants
+inline constexpr std::array<std::string_view, 4> GIT_OBJECT_TYPES{
+    "blob", "commit", "tag", "tree"};
 
 // init Command
 struct InitOptions {
@@ -18,7 +25,7 @@ int run_init(const InitOptions& opts);
 
 // cat-file Command
 struct CatFileOptions {
-    std::string type{};
+    std::string object_type{"blob"};
     std::string object_id{};
 };
 struct CatFileBinding {
@@ -27,3 +34,16 @@ struct CatFileBinding {
 };
 CatFileBinding register_catfile(CLI::App& app);
 int run_catfile(const CatFileOptions& opts);
+
+// hash-file Command
+struct HashFileOptions {
+    std::string object_type{"blob"};
+    bool perform_write{false};
+    std::string path{"."};
+};
+struct HashFileBinding {
+    CLI::App* subcommand{};
+    HashFileOptions options{};
+};
+HashFileBinding register_hashfile(CLI::App& app);
+int run_hashfile(const HashFileOptions& opts);

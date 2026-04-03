@@ -12,7 +12,7 @@ class GitObject {
     using Bytes = std::vector<std::uint8_t>;
 
     virtual ~GitObject() = default;
-    virtual std::string_view type() const = 0;
+    virtual std::string_view object_type() const = 0;
     virtual Bytes serialize() const = 0;
 };
 
@@ -22,7 +22,7 @@ class Blob : public GitObject {
 
    public:
     explicit Blob(Bytes data) : data(std::move(data)) {}
-    std::string_view type() const noexcept override { return "blob"; }
+    std::string_view object_type() const noexcept override { return "blob"; }
     Bytes serialize() const override { return data; }
     static Blob from_bytes(Bytes::const_iterator begin,
                            Bytes::const_iterator end);
@@ -37,4 +37,9 @@ std::string write_object(const GitObject& obj, const GitRepository* repo);
 
 // Find an object based on its identifier
 std::string find_object(const GitRepository& repo, std::string_view name,
-                        std::string_view format);
+                        std::string_view object_type);
+
+// Compute object hash and optionally create a blob from a file
+std::string hash_object(const std::filesystem::path& path,
+                        std::string_view object_type,
+                        const GitRepository* repo);
