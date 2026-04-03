@@ -10,8 +10,14 @@
 namespace fs = std::filesystem;
 using Bytes = std::vector<std::uint8_t>;
 
-Blob Blob::from_bytes(Bytes::const_iterator begin, Bytes::const_iterator end) {
-    return Blob{Bytes{begin, end}};
+Blob Blob::from_bytes(std::span<const std::uint8_t> data) {
+    return Blob{Bytes{data.begin(), data.end()}};
+}
+
+Bytes Commit::serialize() const { return kvlm_serialize(kvlm); }
+
+Commit Commit::from_bytes(std::span<const std::uint8_t> data) {
+    return Commit{kvlm_parse(data)};
 }
 
 std::unique_ptr<GitObject> read_object(const GitRepository& repo,
@@ -43,10 +49,12 @@ std::unique_ptr<GitObject> read_object(const GitRepository& repo,
         throw std::runtime_error(
             "Actual content size is different from size stated in header.");
 
+    // TODO: Implement for other object types
     // Object dispatch
     if (object_type == "blob") {
         return std::make_unique<Blob>(
-            Blob::from_bytes(content_begin, raw.end()));
+            Blob::from_bytes(std::span<const std::uint8_t>{raw}.subspan(
+                content_begin - raw.begin())));
     }
 
     throw std::runtime_error("Unknown object type: " + object_type);
@@ -95,8 +103,11 @@ std::string find_object(const GitRepository& repo, std::string_view name,
 std::string hash_object(const fs::path& path, std::string_view object_type,
                         const GitRepository* repo) {
     Bytes data = read_file(path);
+
+    // TODO: Implement for other object types
     if (object_type == "blob") {
-        return write_object(Blob::from_bytes(data.begin(), data.end()), repo);
+        return write_object(
+            Blob::from_bytes(std::span<const std::uint8_t>{data}), repo);
     } else {
         throw std::runtime_error("Unknown object type detected: " +
                                  std::string{object_type});

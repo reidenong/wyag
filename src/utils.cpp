@@ -4,6 +4,8 @@
 #include <zlib.h>
 
 #include <fstream>
+#include <iomanip>
+#include <sstream>
 #include <stdexcept>
 
 namespace fs = std::filesystem;

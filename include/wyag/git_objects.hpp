@@ -2,10 +2,12 @@
 
 #include <cstdint>
 #include <memory>
+#include <span>
 #include <string_view>
 #include <vector>
 
 #include "wyag/git_repository.hpp"
+#include "wyag/kvlm.hpp"
 
 class GitObject {
    public:
@@ -24,8 +26,18 @@ class Blob : public GitObject {
     explicit Blob(Bytes data) : data(std::move(data)) {}
     std::string_view object_type() const noexcept override { return "blob"; }
     Bytes serialize() const override { return data; }
-    static Blob from_bytes(Bytes::const_iterator begin,
-                           Bytes::const_iterator end);
+    static Blob from_bytes(std::span<const std::uint8_t> data);
+};
+
+class Commit : public GitObject {
+   private:
+    Kvlm kvlm{};
+
+   public:
+    explicit Commit(Kvlm kvlm) : kvlm(std::move(kvlm)) {}
+    std::string_view object_type() const noexcept override { return "commit"; }
+    Bytes serialize() const override;
+    static Commit from_bytes(std::span<const std::uint8_t> data);
 };
 
 // Read object sha from repo, returning the relevant object
