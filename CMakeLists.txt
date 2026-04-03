@@ -6,9 +6,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(ZLIB REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 file(GLOB WYAG_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 
 add_executable(wyag ${WYAG_SOURCES})
 target_include_directories(wyag PRIVATE ${PROJECT_SOURCE_DIR}/include)
-target_link_libraries(wyag PRIVATE ZLIB::ZLIB)
+target_link_libraries(wyag PRIVATE ZLIB::ZLIB OpenSSL::Crypto)

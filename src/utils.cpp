@@ -1,5 +1,6 @@
 #include "wyag/utils.hpp"
 
+#include <openssl/sha.h>
 #include <zlib.h>
 
 #include <fstream>
@@ -75,6 +76,16 @@ Bytes read_file(const fs::path& path) {
                  std::istreambuf_iterator<char>());
 }
 
+void write_file(const fs::path& path, const Bytes& content) {
+    std::ofstream file{path, std::ios::binary};
+    if (!file)
+        throw std::runtime_error("Failed to create file: " + path.string());
+    file.write(reinterpret_cast<const char*>(content.data()),
+               static_cast<std::streamsize>(content.size()));
+    if (!file)
+        throw std::runtime_error("Failed to create file: " + path.string());
+}
+
 Bytes streaming_decompress(const Bytes& compressed) {
     z_stream stream{};
     stream.next_in =
@@ -108,4 +119,17 @@ Bytes streaming_decompress(const Bytes& compressed) {
 
     inflateEnd(&stream);
     return result;
+}
+
+std::string get_sha1_hex(const Bytes& bytes) {
+    uint8_t digest[SHA_DIGEST_LENGTH];
+    SHA1(bytes.data(), bytes.size(), digest);
+
+    std::ostringstream oss;
+    oss << std::hex << std::setfill('0');
+
+    for (std::size_t i = 0; i < SHA_DIGEST_LENGTH; i++) {
+        oss << std::setw(2) << static_cast<int>(digest[i]);
+    }
+    return oss.str();
 }

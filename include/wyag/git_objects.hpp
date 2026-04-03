@@ -31,3 +31,6 @@ class Blob : public GitObject {
 // Read object sha from repo, returning the relevant object
 std::unique_ptr<GitObject> read_object(const GitRepository& repo,
                                        std::string_view sha);
+
+// Compute the hash and write object in the correct location
+std::string write_object(const GitObject& obj, const GitRepository* repo);

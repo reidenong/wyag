@@ -1,5 +1,8 @@
 #include "wyag/git_objects.hpp"
 
+#include <openssl/sha.h>
+#include <zlib.h>
+
 #include <algorithm>
 
 #include "wyag/utils.hpp"
@@ -40,4 +43,38 @@ std::unique_ptr<GitObject> read_object(const GitRepository& repo,
             Blob::from_bytes(content_begin, raw.end()));
     }
     throw std::runtime_error("Unknown object type: " + format);
+}
+
+std::string write_object(const GitObject& obj, const GitRepository* repo) {
+    Bytes content = obj.serialize();
+
+    std::string header =
+        std::string{obj.type()} + ' ' + std::to_string(content.size()) + '\0';
+
+    Bytes result{};
+    result.reserve(header.size() + content.size());
+    result.insert(result.end(), header.begin(), header.end());
+    result.insert(result.end(), content.begin(), content.end());
+
+    std::string sha = get_sha1_hex(result);
+
+    if (repo) {
+        std::string_view sha_sv{sha};
+        auto path_opt = repo_file(
+            *repo, {"objects", sha_sv.substr(0, 2), sha_sv.substr(2)}, true);
+        if (!path_opt) throw std::runtime_error("Cannot create repo file.");
+
+        // Perform zlib compression
+        uLongf output_size{compressBound(result.size())};
+        Bytes compressed_result(output_size);
+        int rc = compress(reinterpret_cast<Bytef*>(compressed_result.data()),
+                          &output_size,
+                          reinterpret_cast<const Bytef*>(result.data()),
+                          static_cast<uLong>(result.size()));
+        compressed_result.resize(output_size);
+
+        if (rc != Z_OK) throw std::runtime_error("zlib compression failed.");
+        write_file(path_opt.value(), compressed_result);
+    }
+    return sha;
 }

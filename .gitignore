@@ -45,3 +45,6 @@ build/
  
 # Test directory
 test/
+
+# Miscellaneous files
+.codex
