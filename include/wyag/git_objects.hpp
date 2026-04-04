@@ -38,6 +38,7 @@ class Commit : public GitObject {
     std::string_view object_type() const noexcept override { return "commit"; }
     Bytes serialize() const override;
     static Commit from_bytes(std::span<const std::uint8_t> data);
+    const Kvlm& read_kvlm() const { return kvlm; }
 };
 
 // Read object sha from repo, returning the relevant object

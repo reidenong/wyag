@@ -56,6 +56,11 @@ std::unique_ptr<GitObject> read_object(const GitRepository& repo,
             Blob::from_bytes(std::span<const std::uint8_t>{raw}.subspan(
                 content_begin - raw.begin())));
     }
+    if (object_type == "commit") {
+        return std::make_unique<Commit>(
+            Commit::from_bytes(std::span<const std::uint8_t>{raw}.subspan(
+                content_begin - raw.begin())));
+    }
 
     throw std::runtime_error("Unknown object type: " + object_type);
 }

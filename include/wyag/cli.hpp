@@ -47,3 +47,14 @@ struct HashFileBinding {
 };
 HashFileBinding register_hashfile(CLI::App& app);
 int run_hashfile(const HashFileOptions& opts);
+
+// log command
+struct LogOptions {
+    std::string commit{"HEAD"};
+};
+struct LogBinding {
+    CLI::App* subcommand{};
+    LogOptions options{};
+};
+LogBinding register_log(CLI::App& app);
+int run_log(const LogOptions& opts);
