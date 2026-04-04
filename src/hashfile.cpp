@@ -13,8 +13,8 @@ HashFileBinding register_hashfile(CLI::App& app) {
     binding.subcommand
         ->add_option("-t", binding.options.object_type, "Specify the type.")
         ->check(CLI::IsMember(GIT_OBJECT_TYPES));
-    binding.subcommand->add_option("-w", binding.options.perform_write,
-                                   "Actually write objects into file.");
+    binding.subcommand->add_flag("-w", binding.options.perform_write,
+                                 "Actually write objects into file.");
     binding.subcommand->add_option("path", binding.options.path,
                                    "Read object from <file>");
     return binding;
