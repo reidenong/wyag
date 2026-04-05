@@ -8,10 +8,13 @@
 using Bytes = std::vector<std::uint8_t>;
 namespace fs = std::filesystem;
 
-// Tree invariant: records are sorted by pathname (directories with / suffix)
-int record_comparator(const TreeLeafRecord& u, const TreeLeafRecord& v) {
-    std::string u_path{u.path.string() + ((u.mode[0] == '4') ? "/" : "")};
-    std::string v_path{v.path.string() + ((v.mode[0] == '4') ? "/" : "")};
+// Tree write invariant: records are sorted by pathname, with directories
+// compared as though they had a trailing slash.
+bool record_comparator(const TreeLeafRecord& u, const TreeLeafRecord& v) {
+    const bool u_is_dir = !u.mode.empty() && u.mode[0] == '4';
+    const bool v_is_dir = !v.mode.empty() && v.mode[0] == '4';
+    std::string u_path{u.path.string() + (u_is_dir ? "/" : "")};
+    std::string v_path{v.path.string() + (v_is_dir ? "/" : "")};
     return u_path < v_path;
 }
 
@@ -47,16 +50,15 @@ std::vector<TreeLeafRecord> parse_treeleaf(std::span<const std::uint8_t> raw) {
         records.emplace_back(std::move(mode), std::move(path), oss.str());
         start_it = sha_end_it;
     }
-
-    // Tree invariant: records sorted by directory path name
-    sort(records.begin(), records.end(), record_comparator);
-
     return records;
 }
 
 Bytes serialize_tree_records(const std::vector<TreeLeafRecord>& records) {
+    std::vector<TreeLeafRecord> sorted_records{records};
+    std::sort(sorted_records.begin(), sorted_records.end(), record_comparator);
+
     Bytes result{};
-    for (auto rec : records) {
+    for (const auto& rec : sorted_records) {
         result.insert(result.end(), rec.mode.begin(), rec.mode.end());
         result.push_back(' ');
 
@@ -69,6 +71,10 @@ Bytes serialize_tree_records(const std::vector<TreeLeafRecord>& records) {
             if (c >= 'a' && c <= 'f') return 10 + (c - 'a');
             throw std::runtime_error("Invalid hex digit in SHA.");
         };
+
+        if (rec.sha.size() != 40) {
+            throw std::runtime_error("Tree SHA must be 40 hex characters.");
+        }
 
         auto sha_hex{rec.sha};
         for (std::size_t i = 0; i < sha_hex.size(); i += 2) {

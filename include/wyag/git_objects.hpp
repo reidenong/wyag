@@ -52,6 +52,7 @@ class Tree : public GitObject {
     std::string_view object_type() const noexcept override { return "tree"; }
     Bytes serialize() const override;
     static Tree from_bytes(std::span<const std::uint8_t> raw);
+    const std::vector<TreeLeafRecord>& get_records() const {return records;}
 };
 
 // Read object sha from repo, returning the relevant object
