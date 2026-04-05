@@ -10,6 +10,8 @@
 namespace fs = std::filesystem;
 using Bytes = std::vector<std::uint8_t>;
 
+// Git Objects
+
 Blob Blob::from_bytes(std::span<const std::uint8_t> data) {
     return Blob{Bytes{data.begin(), data.end()}};
 }
@@ -19,6 +21,14 @@ Bytes Commit::serialize() const { return kvlm_serialize(kvlm); }
 Commit Commit::from_bytes(std::span<const std::uint8_t> data) {
     return Commit{kvlm_parse(data)};
 }
+
+Bytes Tree::serialize() const { return serialize_tree_records(records); }
+
+Tree Tree::from_bytes(std::span<const std::uint8_t> raw) {
+    return Tree{parse_treeleaf(raw)};
+}
+
+// Object utilities
 
 std::unique_ptr<GitObject> read_object(const GitRepository& repo,
                                        std::string_view sha) {

@@ -8,6 +8,7 @@
 
 #include "wyag/git_repository.hpp"
 #include "wyag/kvlm.hpp"
+#include "wyag/tree.hpp"
 
 class GitObject {
    public:
@@ -39,6 +40,18 @@ class Commit : public GitObject {
     Bytes serialize() const override;
     static Commit from_bytes(std::span<const std::uint8_t> data);
     const Kvlm& read_kvlm() const { return kvlm; }
+};
+
+class Tree : public GitObject {
+   private:
+    std::vector<TreeLeafRecord> records{};
+
+   public:
+    explicit Tree(std::vector<TreeLeafRecord> records)
+        : records(std::move(records)) {}
+    std::string_view object_type() const noexcept override { return "tree"; }
+    Bytes serialize() const override;
+    static Tree from_bytes(std::span<const std::uint8_t> raw);
 };
 
 // Read object sha from repo, returning the relevant object
