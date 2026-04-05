@@ -60,13 +60,25 @@ LogBinding register_log(CLI::App& app);
 int run_log(const LogOptions& opts);
 
 // ls-tree command
-struct LsTreeOptions{
-    bool recursive {false};
-    std::string tree_sha {};
+struct LsTreeOptions {
+    bool recursive{false};
+    std::string tree_sha{};
 };
 struct LsTreeBinding {
-    CLI:: App* subcommand {};
+    CLI::App* subcommand{};
     LsTreeOptions options{};
 };
 LsTreeBinding register_lstree(CLI::App& app);
 int run_lstree(const LsTreeOptions& opts);
+
+// checkout command
+struct CheckoutOptions {
+    std::string sha{};
+    std::string path{};
+};
+struct CheckoutBinding {
+    CLI::App* subcommand{};
+    CheckoutOptions options{};
+};
+CheckoutBinding register_checkout(CLI::App& app);
+int run_checkout(const CheckoutOptions& opts);

@@ -28,6 +28,7 @@ class Blob : public GitObject {
     std::string_view object_type() const noexcept override { return "blob"; }
     Bytes serialize() const override { return data; }
     static Blob from_bytes(std::span<const std::uint8_t> data);
+    const Bytes& read_data() const { return data; }
 };
 
 class Commit : public GitObject {
@@ -52,7 +53,7 @@ class Tree : public GitObject {
     std::string_view object_type() const noexcept override { return "tree"; }
     Bytes serialize() const override;
     static Tree from_bytes(std::span<const std::uint8_t> raw);
-    const std::vector<TreeLeafRecord>& get_records() const {return records;}
+    const std::vector<TreeLeafRecord>& get_records() const { return records; }
 };
 
 // Read object sha from repo, returning the relevant object

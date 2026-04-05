@@ -13,6 +13,7 @@ int main(int argc, char** argv) {
     auto catfile = register_catfile(app);
     auto hashfile = register_hashfile(app);
     auto lstree = register_lstree(app);
+    auto checkout = register_checkout(app);
 
     // Run command
     try {
@@ -22,6 +23,7 @@ int main(int argc, char** argv) {
         if (*catfile.subcommand) return run_catfile(catfile.options);
         if (*hashfile.subcommand) return run_hashfile(hashfile.options);
         if (*lstree.subcommand) return run_lstree(lstree.options);
+        if (*checkout.subcommand) return run_checkout(checkout.options);
     } catch (const std::exception& e) {
         std::cerr << "wyag: " << e.what() << '\n';
         return 1;
