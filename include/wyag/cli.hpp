@@ -82,3 +82,12 @@ struct CheckoutBinding {
 };
 CheckoutBinding register_checkout(CLI::App& app);
 int run_checkout(const CheckoutOptions& opts);
+
+// show-ref command
+struct ShowRefOptions {};
+struct ShowRefBinding {
+    CLI::App* subcommand{};
+    ShowRefOptions options{};
+};
+ShowRefBinding register_showref(CLI::App& app);
+int run_showref(const ShowRefOptions& opts);

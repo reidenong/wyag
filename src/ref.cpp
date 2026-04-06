@@ -1,5 +1,6 @@
 #include "wyag/ref.hpp"
 
+#include <algorithm>
 #include <filesystem>
 #include <optional>
 #include <string>
@@ -26,6 +27,33 @@ std::optional<std::string> resolve_ref(const GitRepository& repo,
     return std::string{bytes.begin(), bytes.end()};
 }
 
-// TODO: Implement
 RefDirectory list_repo_refs(const GitRepository& repo,
-                            std::filesystem::path path);
+                            std::filesystem::path dir_path) {
+    RefDirectory refdir{dir_path.filename()};
+
+    if (!fs::is_directory(dir_path))
+        throw std::runtime_error("Not a directory");
+
+    std::vector<fs::path> entries{};
+    for (const auto& entry : fs::directory_iterator(dir_path)) {
+        entries.push_back(entry.path());
+    }
+
+    std::sort(entries.begin(), entries.end(),
+              [](const fs::path& a, const fs::path& b) {
+                  return a.filename().string() < b.filename().string();
+              });
+
+    for (const auto& entry_path : entries) {
+        if (fs::is_directory(entry_path)) {
+            refdir.subdir.push_back(
+                std::move(list_repo_refs(repo, entry_path)));
+        } else if (fs::is_regular_file(entry_path)) {
+            auto sha_opt = resolve_ref(repo, entry_path);
+            if (!sha_opt) continue;
+            refdir.refs.push_back(
+                DirectRef{entry_path.filename().string(), sha_opt.value()});
+        }
+    }
+    return refdir;
+}
