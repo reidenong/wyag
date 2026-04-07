@@ -16,12 +16,17 @@ ShowRefBinding register_showref(CLI::App& app) {
     return binding;
 }
 
-void print_refdir(const RefDirectory& refdir, const fs::path& path) {
+void print_refdir(const RefDirectory& refdir, fs::path prefix, bool with_hash) {
     for (const auto& dr : refdir.refs) {
-        std::cout << dr.sha << ' ' << (path / dr.name).string() << std::endl;
+        fs::path ref_name = prefix / dr.name;
+        if (with_hash) {
+            std::cout << dr.sha << ' ' << ref_name.string() << std::endl;
+        } else {
+            std::cout << ref_name.string() << std::endl;
+        }
     }
     for (const auto& dir : refdir.subdir) {
-        print_refdir(dir, path / dir.name);
+        print_refdir(dir, prefix / dir.name, with_hash);
     }
 }
 

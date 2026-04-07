@@ -10,6 +10,15 @@
 namespace fs = std::filesystem;
 using Bytes = std::vector<std::uint8_t>;
 
+void create_ref(const GitRepository& repo, std::string_view ref_name,
+                std::string_view sha) {
+    auto filepath = repo_file(repo, {"refs/", ref_name}, true);
+    if (!filepath) return;
+    std::string content = std::string{sha};
+    content.push_back('\n');
+    write_file(*filepath, {content.begin(), content.end()});
+}
+
 std::optional<std::string> resolve_ref(const GitRepository& repo,
                                        fs::path path) {
     if (!fs::is_regular_file(path)) return {};

@@ -22,6 +22,16 @@ Commit Commit::from_bytes(std::span<const std::uint8_t> data) {
     return Commit{kvlm_parse(data)};
 }
 
+void Commit::add_header(std::string_view key,
+                        std::span<const std::uint8_t> data) {
+    kvlm.headers.emplace_back(std::string{key},
+                              Bytes{data.begin(), data.end()});
+}
+
+void Commit::set_message(std::span<const std::uint8_t> message) {
+    kvlm.message = Bytes{message.begin(), message.end()};
+}
+
 Bytes Tree::serialize() const { return serialize_tree_records(records); }
 
 Tree Tree::from_bytes(std::span<const std::uint8_t> raw) {
@@ -74,6 +84,11 @@ std::unique_ptr<GitObject> read_object(const GitRepository& repo,
     if (object_type == "tree") {
         return std::make_unique<Tree>(
             Tree::from_bytes(std::span<const std::uint8_t>{raw}.subspan(
+                content_begin - raw.begin())));
+    }
+    if (object_type == "tag") {
+        return std::make_unique<Tag>(
+            Tag::from_bytes(std::span<const std::uint8_t>{raw}.subspan(
                 content_begin - raw.begin())));
     }
 

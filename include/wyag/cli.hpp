@@ -3,6 +3,7 @@
 #include <string_view>
 
 #include "wyag/git_repository.hpp"
+#include "wyag/ref.hpp"
 
 namespace CLI {
 class App;
@@ -90,4 +91,19 @@ struct ShowRefBinding {
     ShowRefOptions options{};
 };
 ShowRefBinding register_showref(CLI::App& app);
+void print_refdir(const RefDirectory& refdir, std::filesystem::path prefix = {},
+                  bool with_hash = true);
 int run_showref(const ShowRefOptions& opts);
+
+// tag command
+struct TagOptions {
+    std::string name{};
+    std::string object_sha{};
+    bool is_tag_object{false};
+};
+struct TagBinding {
+    CLI::App* subcommand{};
+    TagOptions options{};
+};
+TagBinding register_tag(CLI::App& app);
+int run_tag(const TagOptions& opts);

@@ -36,11 +36,23 @@ class Commit : public GitObject {
     Kvlm kvlm{};
 
    public:
+    Commit() = default;
     explicit Commit(Kvlm kvlm) : kvlm(std::move(kvlm)) {}
     std::string_view object_type() const noexcept override { return "commit"; }
     Bytes serialize() const override;
     static Commit from_bytes(std::span<const std::uint8_t> data);
     const Kvlm& read_kvlm() const { return kvlm; }
+    void add_header(std::string_view key, std::span<const std::uint8_t> data);
+    void set_message(std::span<const std::uint8_t> message);
+};
+
+class Tag : public Commit {
+   public:
+    using Commit::Commit;
+    std::string_view object_type() const noexcept override { return "tag"; }
+    static Tag from_bytes(std::span<const std::uint8_t> data) {
+        return Tag{kvlm_parse(data)};
+    }
 };
 
 class Tree : public GitObject {
