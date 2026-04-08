@@ -4,11 +4,30 @@
 #include <zlib.h>
 
 #include <algorithm>
+#include <cctype>
+#include <ranges>
 
+#include "wyag/ref.hpp"
 #include "wyag/utils.hpp"
 
 namespace fs = std::filesystem;
 using Bytes = std::vector<std::uint8_t>;
+
+namespace {
+
+std::string_view trim_ascii_whitespace(std::string_view sv) {
+    auto is_space = [](unsigned char ch) { return std::isspace(ch) != 0; };
+
+    while (!sv.empty() && is_space(static_cast<unsigned char>(sv.front()))) {
+        sv.remove_prefix(1);
+    }
+    while (!sv.empty() && is_space(static_cast<unsigned char>(sv.back()))) {
+        sv.remove_suffix(1);
+    }
+    return sv;
+}
+
+}  // namespace
 
 // Git Objects
 
@@ -127,6 +146,64 @@ std::string write_object(const GitObject& obj, const GitRepository* repo) {
         write_file(path_opt.value(), compressed_result);
     }
     return sha;
+}
+
+std::vector<std::string> resolve_object(const GitRepository& repo,
+                                        std::string_view name) {
+    name = trim_ascii_whitespace(name);
+
+    if (name.empty()) return {};
+
+    if (name == "HEAD") {
+        auto ref = resolve_ref(repo, repo.get_gitdir() / "HEAD");
+        if (ref) return {*ref};
+        return {};
+    }
+
+    std::vector<std::string> candidates{};
+
+    // Try for hash
+    auto is_hex = [](unsigned char ch) { return std::isxdigit(ch) != 0; };
+
+    if (name.size() >= 4 && name.size() <= 40 &&
+        std::ranges::all_of(name, is_hex)) {
+        std::string lowered{name};
+        std::ranges::transform(lowered, lowered.begin(), [](unsigned char ch) {
+            return static_cast<char>(std::tolower(ch));
+        });
+
+        const std::string prefix = lowered.substr(0, 2);
+        const std::string remainder = lowered.substr(2);
+
+        auto object_dir = repo_dir(repo, {"objects", prefix}, false);
+        if (object_dir) {
+            for (const auto& entry : fs::directory_iterator(*object_dir)) {
+                if (!entry.is_regular_file()) continue;
+
+                const std::string filename = entry.path().filename().string();
+                if (filename.starts_with(remainder)) {
+                    candidates.push_back(prefix + filename);
+                }
+            }
+        }
+    }
+
+    // Try references
+    auto tag_object =
+        resolve_ref(repo, repo.get_gitdir() / "refs" / "tags" / fs::path{name});
+    if (tag_object) candidates.push_back(*tag_object);
+
+    // Try branches
+    auto branch_object = resolve_ref(
+        repo, repo.get_gitdir() / "refs" / "heads" / fs::path{name});
+    if (branch_object) candidates.push_back(*branch_object);
+
+    // Try remote branches
+    auto remote_branch_object = resolve_ref(
+        repo, repo.get_gitdir() / "refs" / "remotes" / fs::path{name});
+    if (remote_branch_object) candidates.push_back(*remote_branch_object);
+
+    return candidates;
 }
 
 std::string find_object(const GitRepository& repo, std::string_view name,
