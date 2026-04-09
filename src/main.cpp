@@ -16,6 +16,7 @@ int main(int argc, char** argv) {
     auto checkout = register_checkout(app);
     auto showref = register_showref(app);
     auto tag = register_tag(app);
+    auto revparse = register_revparse(app);
 
     // Run command
     try {
@@ -28,6 +29,7 @@ int main(int argc, char** argv) {
         if (*checkout.subcommand) return run_checkout(checkout.options);
         if (*showref.subcommand) return run_showref(showref.options);
         if (*tag.subcommand) return run_tag(tag.options);
+        if (*revparse.subcommand) return run_revparse(revparse.options);
     } catch (const std::exception& e) {
         std::cerr << "wyag: " << e.what() << '\n';
         return 1;

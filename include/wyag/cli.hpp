@@ -107,3 +107,16 @@ struct TagBinding {
 };
 TagBinding register_tag(CLI::App& app);
 int run_tag(const TagOptions& opts);
+
+// rev-parse command
+struct RevParseOptions {
+    std::string object_type{};
+    std::string name{};
+    bool no_follow{false};
+};
+struct RevParseBinding {
+    CLI::App* subcommand{};
+    RevParseOptions options{};
+};
+RevParseBinding register_revparse(CLI::App& app);
+int run_revparse(const RevParseOptions& opts);
