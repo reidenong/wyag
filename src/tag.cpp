@@ -29,17 +29,18 @@ void create_tag(const GitRepository& repo, std::string_view name,
                 std::string_view object, bool is_tag_object) {
     // Get the GitObject from the object reference
     std::string target = object.empty() ? "HEAD" : std::string{object};
-    std::string sha = find_object(repo, target, "commit");
+    auto sha = find_object(repo, target, "commit");
+    if (!sha) throw std::runtime_error("Target is not a commit.");
 
     // Create lightweight tag
     if (!is_tag_object) {
-        create_ref(repo, "tags/" + std::string{name}, sha);
+        create_ref(repo, "tags/" + std::string{name}, *sha);
         return;
     }
 
     // Create object tag
     Tag tag{};
-    tag.add_header("object", Bytes{sha.begin(), sha.end()});
+    tag.add_header("object", Bytes{sha->begin(), sha->end()});
     std::string type{"commit"};
     tag.add_header("type", Bytes{type.begin(), type.end()});
     tag.add_header("tag", Bytes{name.begin(), name.end()});

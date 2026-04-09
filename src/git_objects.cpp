@@ -148,6 +148,16 @@ std::string write_object(const GitObject& obj, const GitRepository* repo) {
     return sha;
 }
 
+std::optional<std::string> kvlm_lookup(const Commit& obj,
+                                       std::string_view key) {
+    for (const auto& entry : obj.read_kvlm().headers) {
+        if (entry.key == key) {
+            return std::string{entry.value.begin(), entry.value.end()};
+        }
+    }
+    return std::nullopt;
+}
+
 std::vector<std::string> resolve_object(const GitRepository& repo,
                                         std::string_view name) {
     name = trim_ascii_whitespace(name);
@@ -206,10 +216,52 @@ std::vector<std::string> resolve_object(const GitRepository& repo,
     return candidates;
 }
 
-std::string find_object(const GitRepository& repo, std::string_view name,
-                        std::string_view object_type) {
-    // TODO: Expand resolution
-    return std::string{name};
+std::optional<std::string> find_object(const GitRepository& repo,
+                                       std::string_view name,
+                                       std::string_view expected_object_type,
+                                       bool follow) {
+    auto sha_vals = resolve_object(repo, name);
+    if (sha_vals.empty())
+        throw std::runtime_error("No such reference " + std::string{name});
+    if (sha_vals.size() > 1)
+        throw std::runtime_error("Ambiguous reference " + std::string{name});
+    std::string sha = sha_vals.front();
+
+    if (expected_object_type.empty()) return sha;
+
+    while (true) {
+        auto obj = read_object(repo, sha);
+        if (!obj) {
+            throw std::runtime_error("Object " + sha + " could not be read.");
+        }
+
+        if (obj->object_type() == expected_object_type) return sha;
+
+        if (!follow) return std::nullopt;
+
+        if (obj->object_type() == "tag") {
+            auto* tag = dynamic_cast<Tag*>(obj.get());
+            if (!tag) throw std::runtime_error("Tag object could not be read.");
+
+            auto target = kvlm_lookup(*tag, "object");
+            if (!target) return std::nullopt;
+            sha = *target;
+            continue;
+        }
+
+        if (obj->object_type() == "commit" && expected_object_type == "tree") {
+            auto* commit = dynamic_cast<Commit*>(obj.get());
+            if (!commit)
+                throw std::runtime_error("Commit object could not be read.");
+
+            auto tree = kvlm_lookup(*commit, "tree");
+            if (!tree) return std::nullopt;
+            sha = *tree;
+            continue;
+        }
+
+        return std::nullopt;
+    }
 }
 
 std::string hash_object(const fs::path& path, std::string_view object_type,

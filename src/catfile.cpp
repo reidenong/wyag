@@ -21,8 +21,13 @@ CatFileBinding register_catfile(CLI::App& app) {
 
 void cat_file(const GitRepository& repo, std::string_view obj_id,
               std::string_view object_type) {
-    std::unique_ptr<GitObject> obj =
-        read_object(repo, find_object(repo, obj_id, object_type));
+    auto sha = find_object(repo, obj_id, object_type);
+    if (!sha) {
+        throw std::runtime_error("No object found with type " +
+                                 std::string{object_type} + ".");
+    }
+
+    std::unique_ptr<GitObject> obj = read_object(repo, *sha);
 
     if (!obj) throw std::runtime_error("Object does not exist.");
     auto bytes = obj->serialize();

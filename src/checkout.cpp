@@ -47,32 +47,16 @@ void checkout(const GitRepository& repo, std::string sha_or_ref,
     if (fs::exists(path) && !fs::is_empty(path))
         throw std::runtime_error("Directory is not empty.");
 
-    auto resolve_name = find_object(repo, sha_or_ref, "commit");
-    auto obj = read_object(repo, resolve_name);
+    auto tree_sha = find_object(repo, sha_or_ref, "tree");
+    if (!tree_sha) throw std::runtime_error("commit/tree is not resolvable.");
+
+    auto obj = read_object(repo, *tree_sha);
     if (!obj) throw std::runtime_error("commit/tree is not resolvable.");
 
     if (!fs::exists(path)) fs::create_directories(path);
-    if (obj->object_type() == "tree") {
-        checkout_tree(repo, *dynamic_cast<Tree*>(obj.get()), path);
-        return;
-    }
-
-    if (obj->object_type() != "commit")
-        throw std::runtime_error("Object is not a commit or tree.");
-
-    auto* commit = dynamic_cast<Commit*>(obj.get());
-    if (!commit) throw std::runtime_error("commit is not resolvable");
-    for (const auto& entry : commit->read_kvlm().headers) {
-        if (entry.key == "tree") {
-            auto obj = read_object(
-                repo, std::string{entry.value.begin(), entry.value.end()});
-            if (!obj)
-                throw std::runtime_error("commit/tree is not resolvable.");
-            checkout_tree(repo, *dynamic_cast<Tree*>(obj.get()), path);
-            return;
-        }
-    }
-    throw std::runtime_error("No tree available to checkout.");
+    auto* tree = dynamic_cast<Tree*>(obj.get());
+    if (!tree) throw std::runtime_error("commit/tree is not resolvable.");
+    checkout_tree(repo, *tree, path);
 }
 
 int run_checkout(const CheckoutOptions& opts) {

@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -75,9 +76,16 @@ std::unique_ptr<GitObject> read_object(const GitRepository& repo,
 // Compute the hash and write object in the correct location
 std::string write_object(const GitObject& obj, const GitRepository* repo);
 
+// Resolve name to possible objects in the repo
+// There can be more than 1 resolution if we are using abbreviated hashes
+std::vector<std::string> resolve_object(const GitRepository& repo,
+                                        std::string_view name);
+
 // Find an object based on its identifier
-std::string find_object(const GitRepository& repo, std::string_view name,
-                        std::string_view object_type);
+std::optional<std::string> find_object(const GitRepository& repo,
+                                       std::string_view name,
+                                       std::string_view object_type = "",
+                                       bool follow = true);
 
 // Compute object hash and optionally create a blob from a file
 std::string hash_object(const std::filesystem::path& path,
