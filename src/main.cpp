@@ -17,6 +17,7 @@ int main(int argc, char** argv) {
     TagOptions tag_options{};
     RevParseOptions revparse_options{};
     LsFilesOptions lsfiles_options{};
+    CheckIgnoreOptions checkignore_options{};
 
     auto init = register_init(app, init_options);
     auto catfile = register_catfile(app, catfile_options);
@@ -27,6 +28,7 @@ int main(int argc, char** argv) {
     auto tag = register_tag(app, tag_options);
     auto revparse = register_revparse(app, revparse_options);
     auto lsfiles = register_lsfiles(app, lsfiles_options);
+    auto checkignore = register_checkignore(app, checkignore_options);
 
     // Run command
     try {
@@ -41,6 +43,8 @@ int main(int argc, char** argv) {
         if (*tag.subcommand) return run_tag(tag_options);
         if (*revparse.subcommand) return run_revparse(revparse_options);
         if (*lsfiles.subcommand) return run_lsfiles(lsfiles_options);
+        if (*checkignore.subcommand)
+            return run_checkignore(checkignore_options);
     } catch (const std::exception& e) {
         std::cerr << "wyag: " << e.what() << '\n';
         return 1;

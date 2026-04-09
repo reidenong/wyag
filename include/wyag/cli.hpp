@@ -122,3 +122,14 @@ struct LsFilesBinding {
 };
 LsFilesBinding register_lsfiles(CLI::App& app, LsFilesOptions& options);
 int run_lsfiles(const LsFilesOptions& opts);
+
+// check-ignore command
+struct CheckIgnoreOptions {
+    std::vector<std::string> paths{};
+};
+struct CheckIgnoreBinding {
+    CLI::App* subcommand{};
+};
+CheckIgnoreBinding register_checkignore(CLI::App& app,
+                                        CheckIgnoreOptions& options);
+int run_checkignore(const CheckIgnoreOptions& opts);

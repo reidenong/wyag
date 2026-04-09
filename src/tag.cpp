@@ -14,8 +14,8 @@ namespace fs = std::filesystem;
 TagBinding register_tag(CLI::App& app, TagOptions& options) {
     TagBinding binding{};
     binding.subcommand = app.add_subcommand("tag", "list or create a new tag");
-    auto* name_opt = binding.subcommand->add_option(
-        "name", options.name, "Tag name.");
+    auto* name_opt =
+        binding.subcommand->add_option("name", options.name, "Tag name.");
     auto* object_opt = binding.subcommand->add_option(
         "[OBJECT_SHA]", options.object_sha, "Object to point at.");
     auto* annotate_opt = binding.subcommand->add_flag(

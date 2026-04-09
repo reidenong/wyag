@@ -13,8 +13,7 @@ LsTreeBinding register_lstree(CLI::App& app, LsTreeOptions& options) {
         app.add_subcommand("ls-tree", "Display history of a given commit");
     binding.subcommand->add_flag("-r", options.recursive,
                                  "Recurse into sub-trees.");
-    binding.subcommand->add_option("tree", options.tree_sha,
-                                   "tree sha.");
+    binding.subcommand->add_option("tree", options.tree_sha, "tree sha.");
     return binding;
 }
 

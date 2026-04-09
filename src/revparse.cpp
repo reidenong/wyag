@@ -15,8 +15,7 @@ RevParseBinding register_revparse(CLI::App& app, RevParseOptions& options) {
     binding.subcommand->add_flag(
         "--no-follow", options.no_follow,
         "Do not follow tags or peel commits to trees.");
-    binding.subcommand->add_option("name", options.name,
-                                   "The name to parse");
+    binding.subcommand->add_option("name", options.name, "The name to parse");
     return binding;
 }
 
