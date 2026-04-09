@@ -120,3 +120,14 @@ struct RevParseBinding {
 };
 RevParseBinding register_revparse(CLI::App& app);
 int run_revparse(const RevParseOptions& opts);
+
+// ls-files command
+struct LsFilesOptions {
+    bool is_verbose{};
+};
+struct LsFilesBinding {
+    CLI::App* subcommand{};
+    LsFilesOptions options{};
+};
+LsFilesBinding register_lsfiles(CLI::App& app);
+int run_lsfiles(const LsFilesOptions& opts);
