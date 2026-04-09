@@ -8,15 +8,15 @@
 
 namespace fs = std::filesystem;
 
-CheckoutBinding register_checkout(CLI::App& app) {
+CheckoutBinding register_checkout(CLI::App& app, CheckoutOptions& options) {
     CheckoutBinding binding{};
     binding.subcommand = app.add_subcommand(
         "checkout", "Checkout a commit inside of a directory");
-    binding.subcommand->add_option("sha", binding.options.sha,
+    binding.subcommand->add_option("sha", options.sha,
                                    "Commit/tree to checkout.");
 
     binding.subcommand
-        ->add_option("path", binding.options.path,
+        ->add_option("path", options.path,
                      "The EMPTY directory to checkout on.")
         ->default_val(".");
     return binding;

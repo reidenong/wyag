@@ -9,29 +9,38 @@ int main(int argc, char** argv) {
     app.require_subcommand(1);
 
     // Register commands
-    auto init = register_init(app);
-    auto catfile = register_catfile(app);
-    auto hashfile = register_hashfile(app);
-    auto lstree = register_lstree(app);
-    auto checkout = register_checkout(app);
+    InitOptions init_options{};
+    CatFileOptions catfile_options{};
+    HashFileOptions hashfile_options{};
+    LsTreeOptions lstree_options{};
+    CheckoutOptions checkout_options{};
+    TagOptions tag_options{};
+    RevParseOptions revparse_options{};
+    LsFilesOptions lsfiles_options{};
+
+    auto init = register_init(app, init_options);
+    auto catfile = register_catfile(app, catfile_options);
+    auto hashfile = register_hashfile(app, hashfile_options);
+    auto lstree = register_lstree(app, lstree_options);
+    auto checkout = register_checkout(app, checkout_options);
     auto showref = register_showref(app);
-    auto tag = register_tag(app);
-    auto revparse = register_revparse(app);
-    auto lsfiles = register_lsfiles(app);
+    auto tag = register_tag(app, tag_options);
+    auto revparse = register_revparse(app, revparse_options);
+    auto lsfiles = register_lsfiles(app, lsfiles_options);
 
     // Run command
     try {
         CLI11_PARSE(app, argc, argv);
 
-        if (*init.subcommand) return run_init(init.options);
-        if (*catfile.subcommand) return run_catfile(catfile.options);
-        if (*hashfile.subcommand) return run_hashfile(hashfile.options);
-        if (*lstree.subcommand) return run_lstree(lstree.options);
-        if (*checkout.subcommand) return run_checkout(checkout.options);
+        if (*init.subcommand) return run_init(init_options);
+        if (*catfile.subcommand) return run_catfile(catfile_options);
+        if (*hashfile.subcommand) return run_hashfile(hashfile_options);
+        if (*lstree.subcommand) return run_lstree(lstree_options);
+        if (*checkout.subcommand) return run_checkout(checkout_options);
         if (*showref.subcommand) return run_showref(showref.options);
-        if (*tag.subcommand) return run_tag(tag.options);
-        if (*revparse.subcommand) return run_revparse(revparse.options);
-        if (*lsfiles.subcommand) return run_lsfiles(lsfiles.options);
+        if (*tag.subcommand) return run_tag(tag_options);
+        if (*revparse.subcommand) return run_revparse(revparse_options);
+        if (*lsfiles.subcommand) return run_lsfiles(lsfiles_options);
     } catch (const std::exception& e) {
         std::cerr << "wyag: " << e.what() << '\n';
         return 1;

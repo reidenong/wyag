@@ -6,16 +6,16 @@
 #include "wyag/git_repository.hpp"
 #include "wyag/utils.hpp"
 
-HashFileBinding register_hashfile(CLI::App& app) {
+HashFileBinding register_hashfile(CLI::App& app, HashFileOptions& options) {
     HashFileBinding binding{};
     binding.subcommand = app.add_subcommand(
         "hash-file", "computes a hash and optionally writes to repository");
     binding.subcommand
-        ->add_option("-t", binding.options.object_type, "Specify the type.")
+        ->add_option("-t", options.object_type, "Specify the type.")
         ->check(CLI::IsMember(GIT_OBJECT_TYPES));
-    binding.subcommand->add_flag("-w", binding.options.perform_write,
+    binding.subcommand->add_flag("-w", options.perform_write,
                                  "Actually write objects into file.");
-    binding.subcommand->add_option("path", binding.options.path,
+    binding.subcommand->add_option("path", options.path,
                                    "Read object from <file>");
     return binding;
 }

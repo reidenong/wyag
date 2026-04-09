@@ -7,12 +7,12 @@
 #include "wyag/git_repository.hpp"
 #include "wyag/utils.hpp"
 
-LogBinding register_log(CLI::App& app) {
+LogBinding register_log(CLI::App& app, LogOptions& options) {
     LogBinding binding{};
     binding.subcommand =
         app.add_subcommand("log", "Display history of a given commit");
     binding.subcommand
-        ->add_option("commit", binding.options.commit, "Commit to start at.")
+        ->add_option("commit", options.commit, "Commit to start at.")
         ->default_val("HEAD");
     return binding;
 }

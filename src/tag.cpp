@@ -11,15 +11,15 @@
 using Bytes = std::vector<std::uint8_t>;
 namespace fs = std::filesystem;
 
-TagBinding register_tag(CLI::App& app) {
+TagBinding register_tag(CLI::App& app, TagOptions& options) {
     TagBinding binding{};
     binding.subcommand = app.add_subcommand("tag", "list or create a new tag");
     auto* name_opt = binding.subcommand->add_option(
-        "name", binding.options.name, "Tag name.");
+        "name", options.name, "Tag name.");
     auto* object_opt = binding.subcommand->add_option(
-        "[OBJECT_SHA]", binding.options.object_sha, "Object to point at.");
+        "[OBJECT_SHA]", options.object_sha, "Object to point at.");
     auto* annotate_opt = binding.subcommand->add_flag(
-        "-a", binding.options.is_tag_object, "Create a tag object.");
+        "-a", options.is_tag_object, "Create a tag object.");
     object_opt->needs(name_opt);
     annotate_opt->needs(name_opt);
     return binding;

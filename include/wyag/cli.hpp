@@ -19,9 +19,8 @@ struct InitOptions {
 };
 struct InitBinding {
     CLI::App* subcommand{};
-    InitOptions options{};
 };
-InitBinding register_init(CLI::App& app);
+InitBinding register_init(CLI::App& app, InitOptions& options);
 int run_init(const InitOptions& opts);
 
 // cat-file Command
@@ -31,9 +30,8 @@ struct CatFileOptions {
 };
 struct CatFileBinding {
     CLI::App* subcommand{};
-    CatFileOptions options{};
 };
-CatFileBinding register_catfile(CLI::App& app);
+CatFileBinding register_catfile(CLI::App& app, CatFileOptions& options);
 int run_catfile(const CatFileOptions& opts);
 
 // hash-file Command
@@ -44,9 +42,8 @@ struct HashFileOptions {
 };
 struct HashFileBinding {
     CLI::App* subcommand{};
-    HashFileOptions options{};
 };
-HashFileBinding register_hashfile(CLI::App& app);
+HashFileBinding register_hashfile(CLI::App& app, HashFileOptions& options);
 int run_hashfile(const HashFileOptions& opts);
 
 // log command
@@ -55,9 +52,8 @@ struct LogOptions {
 };
 struct LogBinding {
     CLI::App* subcommand{};
-    LogOptions options{};
 };
-LogBinding register_log(CLI::App& app);
+LogBinding register_log(CLI::App& app, LogOptions& options);
 int run_log(const LogOptions& opts);
 
 // ls-tree command
@@ -67,9 +63,8 @@ struct LsTreeOptions {
 };
 struct LsTreeBinding {
     CLI::App* subcommand{};
-    LsTreeOptions options{};
 };
-LsTreeBinding register_lstree(CLI::App& app);
+LsTreeBinding register_lstree(CLI::App& app, LsTreeOptions& options);
 int run_lstree(const LsTreeOptions& opts);
 
 // checkout command
@@ -79,9 +74,8 @@ struct CheckoutOptions {
 };
 struct CheckoutBinding {
     CLI::App* subcommand{};
-    CheckoutOptions options{};
 };
-CheckoutBinding register_checkout(CLI::App& app);
+CheckoutBinding register_checkout(CLI::App& app, CheckoutOptions& options);
 int run_checkout(const CheckoutOptions& opts);
 
 // show-ref command
@@ -103,9 +97,8 @@ struct TagOptions {
 };
 struct TagBinding {
     CLI::App* subcommand{};
-    TagOptions options{};
 };
-TagBinding register_tag(CLI::App& app);
+TagBinding register_tag(CLI::App& app, TagOptions& options);
 int run_tag(const TagOptions& opts);
 
 // rev-parse command
@@ -116,9 +109,8 @@ struct RevParseOptions {
 };
 struct RevParseBinding {
     CLI::App* subcommand{};
-    RevParseOptions options{};
 };
-RevParseBinding register_revparse(CLI::App& app);
+RevParseBinding register_revparse(CLI::App& app, RevParseOptions& options);
 int run_revparse(const RevParseOptions& opts);
 
 // ls-files command
@@ -127,7 +119,6 @@ struct LsFilesOptions {
 };
 struct LsFilesBinding {
     CLI::App* subcommand{};
-    LsFilesOptions options{};
 };
-LsFilesBinding register_lsfiles(CLI::App& app);
+LsFilesBinding register_lsfiles(CLI::App& app, LsFilesOptions& options);
 int run_lsfiles(const LsFilesOptions& opts);

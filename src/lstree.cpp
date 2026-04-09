@@ -7,13 +7,13 @@
 #include "wyag/git_repository.hpp"
 #include "wyag/utils.hpp"
 
-LsTreeBinding register_lstree(CLI::App& app) {
+LsTreeBinding register_lstree(CLI::App& app, LsTreeOptions& options) {
     LsTreeBinding binding{};
     binding.subcommand =
         app.add_subcommand("ls-tree", "Display history of a given commit");
-    binding.subcommand->add_flag("-r", binding.options.recursive,
+    binding.subcommand->add_flag("-r", options.recursive,
                                  "Recurse into sub-trees.");
-    binding.subcommand->add_option("tree", binding.options.tree_sha,
+    binding.subcommand->add_option("tree", options.tree_sha,
                                    "tree sha.");
     return binding;
 }

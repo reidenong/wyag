@@ -6,15 +6,14 @@
 #include "wyag/git_repository.hpp"
 #include "wyag/utils.hpp"
 
-CatFileBinding register_catfile(CLI::App& app) {
+CatFileBinding register_catfile(CLI::App& app, CatFileOptions& options) {
     CatFileBinding binding{};
     binding.subcommand =
         app.add_subcommand("cat-file", "Provide content of repository object");
     binding.subcommand
-        ->add_option("object_type", binding.options.object_type,
-                     "Specify the type.")
+        ->add_option("object_type", options.object_type, "Specify the type.")
         ->check(CLI::IsMember(GIT_OBJECT_TYPES));
-    binding.subcommand->add_option("object_id", binding.options.object_id,
+    binding.subcommand->add_option("object_id", options.object_id,
                                    "The identifier of the object to display.");
     return binding;
 }
