@@ -12,8 +12,15 @@
 #include "wyag/git_repository.hpp"
 #include "wyag/index.hpp"
 #include "wyag/utils.hpp"
+#include <fnmatch.h>
+
 namespace fs = std::filesystem;
 using Bytes = std::vector<std::uint8_t>;
+
+bool matches(std::string_view pattern, std::string_view target) {
+    return fnmatch(pattern.data(), target.data(), 0) == 0;
+}
+
 std::optional<IgnoreRule> parse1_gitignore(std::string_view s) {
     while (!s.empty() && s.front() == ' ') s.remove_prefix(1);
     while (!s.empty() && s.back() == ' ') s.remove_suffix(1);
@@ -37,6 +44,36 @@ std::vector<IgnoreRule> parse_gitignore(std::string_view content) {
         start = std::next(newl);
     }
     return rules;
+}
+
+CheckResult ignore1_check(const IgnoreRule& rule, std::string_view path) {
+        if (matches(rule.path, path)) {
+            return  (rule.to_ignore ? CheckResult::ignore : CheckResult::no_ignore);
+        }
+    return {};
+}
+
+CheckResult check_scoped_ignore(const std::vector<ScopedRule>& rules, std::string_view path) {
+    std::string parent = fs::path{path}.parent_path().string();
+    while (true) {
+        for (const auto& sr : rules) {
+            if (parent != sr.dir_name) continue;
+            CheckResult result = ignore1_check(sr.rule, path);
+            if (result != CheckResult::unmatched) return result;
+        }
+        if (parent == "") break;
+        parent = fs::path{parent}.parent_path().string();
+    }
+    return CheckResult::unmatched;
+}
+
+CheckResult check_absolute_ignore(const std::vector<IgnoreRule>& rules, std::string_view path) {
+    std::string parent = fs::path{path}.parent_path().string();
+    for (const auto& rule : rules) {
+        CheckResult result = ignore1_check(rule, path);
+        if (result != CheckResult::unmatched) return result;
+    }
+    return CheckResult::no_ignore; // reasonable default
 }
 
 GitIgnore read_gitignore(const GitRepository& repo) {
