@@ -1,14 +1,13 @@
+#include <filesystem>
 #include <iostream>
 
 #include "CLI11.hpp"
 #include "wyag/cli.hpp"
 #include "wyag/git_objects.hpp"
 #include "wyag/git_repository.hpp"
+#include "wyag/ignore.hpp"
 #include "wyag/index.hpp"
 #include "wyag/utils.hpp"
-#include "wyag/ignore.hpp"
-#include <filesystem>
-
 
 namespace fs = std::filesystem;
 
@@ -23,7 +22,9 @@ CheckIgnoreBinding register_checkignore(CLI::App& app,
 }
 
 bool check_ignore(const GitIgnore& ignore, std::string_view path) {
-    if (fs::path{path}.is_absolute()) throw std::runtime_error("Checking ignore requires a path relative to repo.");
+    if (fs::path{path}.is_absolute())
+        throw std::runtime_error(
+            "Checking ignore requires a path relative to repo.");
 
     CheckResult result = check_scoped_ignore(ignore.scoped, path);
     if (result != CheckResult::unmatched) return result == CheckResult::ignore;

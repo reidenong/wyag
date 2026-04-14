@@ -133,3 +133,11 @@ struct CheckIgnoreBinding {
 CheckIgnoreBinding register_checkignore(CLI::App& app,
                                         CheckIgnoreOptions& options);
 int run_checkignore(const CheckIgnoreOptions& opts);
+
+// status command
+struct StatusOptions {};
+struct StatusBinding {
+    CLI::App* subcommand{};
+};
+StatusBinding register_status(CLI::App& app, StatusOptions& options);
+int run_status(const StatusOptions& opts);

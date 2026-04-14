@@ -11,6 +11,8 @@ struct TreeLeafRecord {
     std::string sha{};
 };
 
+// Tree definition in git_objects.hpp
+
 std::vector<TreeLeafRecord> parse_treeleaf(std::span<const std::uint8_t> raw);
 std::vector<std::uint8_t> serialize_tree_records(
     const std::vector<TreeLeafRecord>& records);
