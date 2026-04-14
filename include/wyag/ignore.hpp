@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -15,11 +14,11 @@ struct IgnoreRule {
 
 struct ScopedRule {
     std::string dir_name{};
-    IgnoreRule rule{};
+    std::vector<IgnoreRule> rules{};
 };
 
 struct GitIgnore {
-    std::vector<IgnoreRule> absolutes{};
+    std::vector<std::vector<IgnoreRule>> absolutes{};
     std::vector<ScopedRule> scoped{};
 };
 
@@ -35,8 +34,13 @@ std::vector<IgnoreRule> parse_gitignore(std::string_view content);
 
 CheckResult ignore1_check(const IgnoreRule& rule, std::string_view path);
 
-CheckResult check_scoped_ignore(const std::vector<ScopedRule>& rules, std::string_view path);
+CheckResult check_ignore1(const std::vector<IgnoreRule>& rules,
+                          std::string_view path);
 
-CheckResult check_absolute_ignore(const std::vector<IgnoreRule>& rules, std::string_view path);
+CheckResult check_scoped_ignore(const std::vector<ScopedRule>& rules,
+                                std::string_view path);
+
+CheckResult check_absolute_ignore(
+    const std::vector<std::vector<IgnoreRule>>& rules, std::string_view path);
 
 GitIgnore read_gitignore(const GitRepository& repo);
