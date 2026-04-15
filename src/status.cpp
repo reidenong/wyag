@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "CLI11.hpp"
+#include "wyag/branch.hpp"
 #include "wyag/cli.hpp"
 #include "wyag/git_objects.hpp"
 #include "wyag/git_repository.hpp"
@@ -22,9 +23,10 @@ int run_status(const StatusOptions& opts) {
     GitRepository repo = find_repo();
     Index index = read_index(repo);
 
-    // cmd_status_branch(repo)
-    // cmd_status_head_index
+    print_branch_status(repo);
     std::cout << std::endl;
-    // cmd_status_index_worktree
+    print_staged(repo, index);
+    std::cout << std::endl;
+    print_unstaged(repo, index);
     return 0;
 }

@@ -44,3 +44,5 @@ CheckResult check_absolute_ignore(
     const std::vector<std::vector<IgnoreRule>>& rules, std::string_view path);
 
 GitIgnore read_gitignore(const GitRepository& repo);
+
+bool check_ignore(const GitIgnore& ignore, std::string_view path);
