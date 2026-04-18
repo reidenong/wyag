@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
     LsFilesOptions lsfiles_options{};
     CheckIgnoreOptions checkignore_options{};
     StatusOptions status_options{};
+    RmOptions rm_options{};
 
     auto init = register_init(app, init_options);
     auto catfile = register_catfile(app, catfile_options);
@@ -31,6 +32,7 @@ int main(int argc, char** argv) {
     auto lsfiles = register_lsfiles(app, lsfiles_options);
     auto checkignore = register_checkignore(app, checkignore_options);
     auto status = register_status(app, status_options);
+    auto rm = register_rm(app, rm_options);
 
     // Run command
     try {
@@ -48,6 +50,7 @@ int main(int argc, char** argv) {
         if (*checkignore.subcommand)
             return run_checkignore(checkignore_options);
         if (*status.subcommand) return run_status(status_options);
+        if (*rm.subcommand) return run_rm(rm_options);
     } catch (const std::exception& e) {
         std::cerr << "wyag: " << e.what() << '\n';
         return 1;

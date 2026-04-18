@@ -141,3 +141,15 @@ struct StatusBinding {
 };
 StatusBinding register_status(CLI::App& app, StatusOptions& options);
 int run_status(const StatusOptions& opts);
+
+// rm command
+struct RmOptions {
+    std::vector<std::string> paths{};
+    bool cached{false};
+    bool skip_missing{false};
+};
+struct RmBinding {
+    CLI::App* subcommand{};
+};
+RmBinding register_rm(CLI::App& app, RmOptions& options);
+int run_rm(const RmOptions& opts);
