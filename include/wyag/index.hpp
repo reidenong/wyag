@@ -33,3 +33,5 @@ struct Index {
 };
 
 Index read_index(const GitRepository& repo);
+
+void write_index(const GitRepository& repo, const Index& index);
