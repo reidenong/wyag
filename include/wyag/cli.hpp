@@ -1,6 +1,8 @@
 #pragma once
+#include <array>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "wyag/git_repository.hpp"
 #include "wyag/ref.hpp"
@@ -152,4 +154,17 @@ struct RmBinding {
     CLI::App* subcommand{};
 };
 RmBinding register_rm(CLI::App& app, RmOptions& options);
+void rm(const GitRepository& repo, const std::vector<std::string>& paths,
+        bool delete_files = true, bool skip_missing = false);
 int run_rm(const RmOptions& opts);
+
+// add command
+struct AddOptions {
+    std::vector<std::string> paths{};
+};
+struct AddBinding {
+    CLI::App* subcommand{};
+};
+AddBinding register_add(CLI::App& app, AddOptions& options);
+void add(const GitRepository& repo, const std::vector<std::string>& paths);
+int run_add(const AddOptions& opts);
