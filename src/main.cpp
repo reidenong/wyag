@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
     StatusOptions status_options{};
     RmOptions rm_options{};
     AddOptions add_options{};
+    CommitOptions commit_options{};
 
     auto init = register_init(app, init_options);
     auto catfile = register_catfile(app, catfile_options);
@@ -35,6 +36,7 @@ int main(int argc, char** argv) {
     auto status = register_status(app, status_options);
     auto rm = register_rm(app, rm_options);
     auto add = register_add(app, add_options);
+    auto commit = register_commit(app, commit_options);
 
     // Run command
     try {
@@ -54,6 +56,7 @@ int main(int argc, char** argv) {
         if (*status.subcommand) return run_status(status_options);
         if (*rm.subcommand) return run_rm(rm_options);
         if (*add.subcommand) return run_add(add_options);
+        if (*commit.subcommand) return run_commit(commit_options);
     } catch (const std::exception& e) {
         std::cerr << "wyag: " << e.what() << '\n';
         return 1;

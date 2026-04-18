@@ -168,3 +168,13 @@ struct AddBinding {
 AddBinding register_add(CLI::App& app, AddOptions& options);
 void add(const GitRepository& repo, const std::vector<std::string>& paths);
 int run_add(const AddOptions& opts);
+
+// commit command
+struct CommitOptions {
+    std::string message{};
+};
+struct CommitBinding {
+    CLI::App* subcommand{};
+};
+CommitBinding register_commit(CLI::App& app, CommitOptions& options);
+int run_commit(const CommitOptions& opts);
