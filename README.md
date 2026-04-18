@@ -16,7 +16,7 @@ Run the program with:
 ./build/wyag --help
 ```
 
-## Commands
+## Common Commands
 
 Initialize a repository:
 
@@ -25,27 +25,39 @@ Initialize a repository:
 ./build/wyag init my-repo
 ```
 
-Print an object from the repository:
+Stage files:
 
 ```bash
-./build/wyag cat-file blob <object-id>
+./build/wyag add README.md
+./build/wyag add src/main.cpp include/wyag/cli.hpp
 ```
 
-Hash a file without writing it to the repository:
+Check status:
 
 ```bash
-./build/wyag hash-file path/to/file
+./build/wyag status
 ```
 
-Hash a file and write it into the repository object database:
+Commit staged files:
 
 ```bash
-./build/wyag hash-file -w path/to/file
+./build/wyag commit -m "initial commit"
 ```
 
-Specify the object type explicitly:
+Remove tracked files:
 
 ```bash
-./build/wyag hash-file -t blob path/to/file
-./build/wyag cat-file blob <object_id>
+./build/wyag rm old-file.txt
+./build/wyag rm --cached generated.txt
 ```
+
+List indexed files:
+
+```bash
+./build/wyag ls-files
+./build/wyag ls-files -v
+```
+
+## Other Commands
+
+Lower-level and less common commands: `cat-file`, `hash-file`, `ls-tree`, `checkout`, `show-ref`, `tag`, `rev-parse`, `check-ignore`.
